@@ -12,3 +12,39 @@ mongo.connect(CONNECTION_STRING, async (err, conn) => {
     console.log(`Successfully connected to: ${CONNECTION_STRING}`)
   }
 })
+
+// POST functions
+exports.addThread = (req, res) => {
+
+}
+
+exports.addReply = (req, res) => {
+
+}
+
+// GET functions
+exports.listThreads = (req, res) => {
+
+}
+
+exports.displayThread = (req, res) => {
+
+}
+
+// PUT functions
+exports.reportThread = (req, res) => {
+
+}
+
+exports.reportReply = (req, res) => {
+
+}
+
+//DELETE functions
+exports.deleteThread = (req, res) => {
+
+}
+
+exports.deleteReply = (req, res) => {
+  
+}
