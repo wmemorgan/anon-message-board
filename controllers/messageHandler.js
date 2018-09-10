@@ -31,7 +31,7 @@ exports.addThread = (req, res) => {
         res.status(500).send(err)
       } else {
         console.log(`New thread created: `, doc.ops[0])
-        res.redirect(`/b/${board}`)
+        res.redirect(`/b/${board}/`)
         // res.json(doc.ops[0])
       }
   })
