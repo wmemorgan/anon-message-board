@@ -15,36 +15,37 @@ mongo.connect(CONNECTION_STRING, async (err, conn) => {
 
 // POST functions
 exports.addThread = (req, res) => {
+  res.send('addThread')
 
 }
 
 exports.addReply = (req, res) => {
-
+  res.send(`addReply`)
 }
 
 // GET functions
 exports.listThreads = (req, res) => {
-
+  res.send('listThreads')
 }
 
 exports.displayThread = (req, res) => {
-
+  res.send('displayThread')
 }
 
 // PUT functions
 exports.reportThread = (req, res) => {
-
+  res.send('reportThread')
 }
 
 exports.reportReply = (req, res) => {
-
+  res.send('reportReply')
 }
 
 //DELETE functions
 exports.deleteThread = (req, res) => {
-
+  res.send('deleteThread')
 }
 
 exports.deleteReply = (req, res) => {
-  
+  res.send('deleteReply')
 }
