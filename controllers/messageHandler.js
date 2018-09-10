@@ -176,7 +176,25 @@ exports.reportReply = (req, res) => {
 
 //DELETE functions
 exports.deleteThread = (req, res) => {
-  res.send('deleteThread')
+  console.log(`deleteThread req.params: `, req.params)
+  console.log(`deleteThread req.query: `, req.query)
+  console.log(`deleteThread req.body: `, req.body)
+  let hex = /[0-9A-Fa-f]{6}/g;
+  let threadId = (hex.test(req.body.thread_id)) ? ObjectId(req.body.thread_id) : req.body.thread_id
+  let query = { '_id': threadId, 'delete_password': req.body.delete_password }
+  console.log(`query is: `, query)
+  db.deleteOne(query, (err, doc) => {
+    if (err) {
+      console.error(err)
+      res.status(500).send(`could not update reply id: ${threadId}`)
+    } else if (doc.result.n == 0) {
+      res.send('incorrect password')
+    }
+    else {
+      console.log(`deleteThread: success`, doc)
+      res.send(`success`)
+    }
+  })
 }
 
 exports.deleteReply = (req, res) => {
