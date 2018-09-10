@@ -111,8 +111,8 @@ exports.displayThread = (req, res) => {
   console.log(`displayThread req.query: `, req.query)
   console.log(`displayThread req.body: `, req.body)
   let hex = /[0-9A-Fa-f]{6}/g;
-  let threadId = (hex.test(req.query.thread_id)) ? ObjectId(req.query.thread_id) : req.query.thread_id;
-  let query = { '_id': threadId }
+  let id = (hex.test(req.query.thread_id)) ? ObjectId(req.query.thread_id) : req.query.thread_id;
+  let query = { '_id': id }
   db.findOne(query, (err, doc) => {
     if (err) throw err
     else if (doc == null) {
@@ -133,10 +133,28 @@ exports.displayThread = (req, res) => {
 
 // PUT functions
 exports.reportThread = (req, res) => {
-  res.send('reportThread')
+  console.log(`reportThread req.params: `, req.params)
+  console.log(`reportThread req.query: `, req.query)
+  console.log(`reportThread req.body: `, req.body)
+  let hex = /[0-9A-Fa-f]{6}/g;
+  let id = (hex.test(req.body.report_id)) ? ObjectId(req.body.report_id) : req.body.report_id
+  let query = { '_id': id }
+  let action = { $set: { reported: true } }
+  db.updateOne(query, action, (err, doc) => {
+    if (err) {
+      console.error(err)
+      res.status(500).send(`could not update ${id}`)
+    }
+    else {
+      res.send('success')
+    }
+  })
 }
 
 exports.reportReply = (req, res) => {
+  console.log(`reportReply req.params: `, req.params)
+  console.log(`reportReply req.query: `, req.query)
+  console.log(`reportReply req.body: `, req.body)
   res.send('reportReply')
 }
 
