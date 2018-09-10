@@ -155,7 +155,23 @@ exports.reportReply = (req, res) => {
   console.log(`reportReply req.params: `, req.params)
   console.log(`reportReply req.query: `, req.query)
   console.log(`reportReply req.body: `, req.body)
-  res.send('reportReply')
+  let hex = /[0-9A-Fa-f]{6}/g;
+  let threadId = (hex.test(req.body.thread_id)) ? ObjectId(req.body.thread_id) : req.body.thread_id
+  let replyId = (hex.test(req.body.reply_id)) ? ObjectId(req.body.reply_id) : req.body.reply_id
+  let query = { '_id': threadId, 'replies._id': replyId }
+  console.log(`reportReply query: `, query)
+  let action = { $set: { 'replies.$.reported': true } }
+  console.log(`reportReply action: `, action)
+  db.updateOne(query, action, (err, doc) => {
+    if (err) {
+      console.error(err)
+      res.status(500).send(`could not update reply id: ${replyId}`)
+    }
+    else {
+      console.log('reportReply: success')
+      res.send('success')
+    }
+  })
 }
 
 //DELETE functions
