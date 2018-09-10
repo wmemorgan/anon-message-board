@@ -15,9 +15,26 @@ mongo.connect(CONNECTION_STRING, async (err, conn) => {
 
 // POST functions
 exports.addThread = (req, res) => {
-  res.send('addThread')
+  let { text, delete_password } = req.body
 
-}
+  db.insertOne(
+    { text: text,
+      created_on: new Date(),
+      bumped_on: new Date(),
+      reported: false,
+      delete_password: delete_password,
+      replies: []
+    }, (err, doc) => {
+      if (err) {
+        console.error(err)
+        res.status(500).send(err)
+      } else {
+        console.log(`New thread created: `, doc.ops[0])
+        res.json(doc.ops[0])
+      }
+  })
+} 
+
 
 exports.addReply = (req, res) => {
   res.send(`addReply`)
