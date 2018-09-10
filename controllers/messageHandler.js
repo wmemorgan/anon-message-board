@@ -73,8 +73,8 @@ exports.addReply = (req, res) => {
     } else {
       // console.log(`Thread found: `, doc)
       console.log(`New reply created`)
-      res.send(`New reply created`)
-      // res.redirect(`/b/${board}/${thread}/`)
+      // res.send(`New reply created`)
+      res.redirect(`/b/${board}/${threadId}/`)
       // res.redirect(`/b/${board}/`)
     }
   })
@@ -107,7 +107,28 @@ let board = req.params.board.toLowerCase()
 }
 
 exports.displayThread = (req, res) => {
-  res.send('displayThread')
+  console.log(`displayThread req.params: `, req.params)
+  console.log(`displayThread req.query: `, req.query)
+  console.log(`displayThread req.body: `, req.body)
+  let hex = /[0-9A-Fa-f]{6}/g;
+  let threadId = (hex.test(req.query.thread_id)) ? ObjectId(req.query.thread_id) : req.query.thread_id;
+  let query = { '_id': threadId }
+  db.findOne(query, (err, doc) => {
+    if (err) throw err
+    else if (doc == null) {
+      res.send(`no thread exists`)
+    } else {
+      let results = {
+        _id: doc._id,
+        text: doc.text,
+        created_on: doc.created_on,
+        bumped_on: doc.bumped_on,
+        replies: doc.replies.map(d => d = { _id: d._id, text: d.text, created_on: d.created_on })
+      }
+      // console.log(results)
+      res.json(results)
+    }
+  })
 }
 
 // PUT functions
