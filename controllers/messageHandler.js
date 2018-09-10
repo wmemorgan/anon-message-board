@@ -40,7 +40,44 @@ exports.addThread = (req, res) => {
 
 
 exports.addReply = (req, res) => {
-  res.send(`addReply`)
+  console.log(`addReply req.params: `, req.params)
+  console.log(`addReply req.query: `, req.query)
+  console.log(`addReply req.body: `, req.body)
+  let { board } = req.params
+  let { text, delete_password } = req.body
+  console.log(`new text: `, text)
+  let hex = /[0-9A-Fa-f]{6}/g;
+  let threadId = (hex.test(req.body.thread_id)) ? ObjectId(req.body.thread_id) : req.body.thread_id;
+  // let threadId = req.body.thread_id;
+  console.log(`input id: `, threadId)
+  let updates = {
+    bumped_on: new Date(),
+  }
+  let newReply = {
+    '_id': ObjectId(),
+    'text': text,
+    created_on: new Date(),
+    reported: false,
+    delete_password: delete_password,
+  }
+  let query = { '_id': threadId }
+  let action = { $set: updates, $push: { "replies": newReply } }
+  // let action = { $set: updates }
+  
+  db.update(query, action, (err, doc) => {
+    if (err) {
+      console.error(err)
+      res.status(500).send('database update attempt failed')
+    } else if (doc === null) {
+      res.send('reply not added to thread')
+    } else {
+      // console.log(`Thread found: `, doc)
+      console.log(`New reply created`)
+      res.send(`New reply created`)
+      // res.redirect(`/b/${board}/${thread}/`)
+      // res.redirect(`/b/${board}/`)
+    }
+  })
 }
 
 // GET functions
