@@ -16,7 +16,7 @@ mongo.connect(CONNECTION_STRING, async (err, conn) => {
 // POST functions
 exports.addThread = (req, res) => {
   console.log(`addThread req.params is: `, req.params)
-  console.log(`req data is: `, req)
+  console.log(`addThread req.body data is: `, req.body)
   let { text, delete_password } = req.body
   let board = req.params.board.toLowerCase()
   db.insertOne(
@@ -34,7 +34,6 @@ exports.addThread = (req, res) => {
       } else {
         console.log(`New thread created: `, doc.ops[0])
         res.redirect(`/b/${board}/`)
-        // res.json(doc.ops[0])
       }
   })
 } 
@@ -46,8 +45,7 @@ exports.addReply = (req, res) => {
 
 // GET functions
 exports.listThreads = (req, res) => {
-  // res.send('listThreads')
-console.log(`req.params`, req.params)
+console.log(`listThread req.params: `, req.params)
 let board = req.params.board.toLowerCase()
   db.find({board})
     .toArray((err, doc) => {
