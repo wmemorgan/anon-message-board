@@ -15,11 +15,13 @@ mongo.connect(CONNECTION_STRING, async (err, conn) => {
 
 // POST functions
 exports.addThread = (req, res) => {
+  console.log(`addThread req.params is: `, req.params)
   console.log(`req data is: `, req)
-  let { text, delete_password, board } = req.body
-
+  let { text, delete_password } = req.body
+  let board = req.params.board.toLowerCase()
   db.insertOne(
-    { text: text,
+    { board: board,
+      text: text,
       created_on: new Date(),
       bumped_on: new Date(),
       reported: false,
@@ -44,7 +46,29 @@ exports.addReply = (req, res) => {
 
 // GET functions
 exports.listThreads = (req, res) => {
-  res.send('listThreads')
+  // res.send('listThreads')
+console.log(`req.params`, req.params)
+let board = req.params.board.toLowerCase()
+  db.find({board})
+    .toArray((err, doc) => {
+      if (err) {
+        console.error(err)
+        res.status(500).send(err)
+      }
+      else {
+        // Code inspired by Drinka Ľubomír https://github.com/lubodrinka/Personal-Library/blob/master/routes/api.js
+        results = doc.map(d => d = { 
+          "_id": d._id, 
+          "text": d.text, 
+          "bumped_on": d.bumped_on,
+          "created_on": d.created_on,
+          "replies" : d.replies,
+          "replycount": d.replies.length
+         })
+        res.send(results)
+      }
+    })
+
 }
 
 exports.displayThread = (req, res) => {
