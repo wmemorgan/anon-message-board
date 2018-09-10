@@ -180,5 +180,24 @@ exports.deleteThread = (req, res) => {
 }
 
 exports.deleteReply = (req, res) => {
-  res.send('deleteReply')
+  console.log(`deleteReply req.params: `, req.params)
+  console.log(`deleteReply req.query: `, req.query)
+  console.log(`deleteReply req.body: `, req.body)
+  let hex = /[0-9A-Fa-f]{6}/g;
+  let threadId = (hex.test(req.body.thread_id)) ? ObjectId(req.body.thread_id) : req.body.thread_id
+  let replyId = (hex.test(req.body.reply_id)) ? ObjectId(req.body.reply_id) : req.body.reply_id
+  let query = { '_id': threadId, 'replies._id': replyId, 'delete_password': req.body.delete_password }
+  console.log(`reportReply query: `, query)
+  let action = { $pull: { 'replies': {'_id': replyId} } }
+  console.log(`reportReply action: `, action)
+  db.updateOne(query, action, (err, doc) => {
+    if (err) {
+      console.error(err)
+      res.status(500).send(`could not delete reply id: ${replyId}`)
+    }
+    else {
+      console.log('deleteReply: success')
+      res.send('success')
+    }
+  })
 }
