@@ -15,7 +15,8 @@ mongo.connect(CONNECTION_STRING, async (err, conn) => {
 
 // POST functions
 exports.addThread = (req, res) => {
-  let { text, delete_password } = req.body
+  console.log(`req data is: `, req)
+  let { text, delete_password, board } = req.body
 
   db.insertOne(
     { text: text,
@@ -30,7 +31,8 @@ exports.addThread = (req, res) => {
         res.status(500).send(err)
       } else {
         console.log(`New thread created: `, doc.ops[0])
-        res.json(doc.ops[0])
+        res.redirect(`/b/${board}`)
+        // res.json(doc.ops[0])
       }
   })
 } 
