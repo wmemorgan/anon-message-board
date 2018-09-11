@@ -43,7 +43,6 @@ suite('Functional Tests', function() {
         chai.request(server)
           .get(`/api/threads/${TEST_BOARD}`)
           .end(function (err, res) {
-            // console.log(`res.body[0]`, res.body[0])
             assert.equal(res.status, 200)
             assert.isArray(res.body, 'response should be an array')
             assert.property(res.body[0], '_id', 'threads in array should contain _id')
@@ -67,8 +66,6 @@ suite('Functional Tests', function() {
           reported: true
         })
         .end(function(err, res) {
-          // console.log(`res.body: `, res.body)
-          // console.log(`res.text: `, res.text)
           assert.equal(res.status, 200)
           assert.equal(res.text, 'success')
           done()
@@ -86,7 +83,7 @@ suite('Functional Tests', function() {
         chai.request(server)
           .post(`/api/replies/${TEST_BOARD}`)
           .send({
-            _id: TEST_ID,
+            thread_id: TEST_ID,
             text: 'Hello, happy to be here!',
             delete_password: TEST_PWD
           })
@@ -104,7 +101,6 @@ suite('Functional Tests', function() {
           .get(`/api/replies/${TEST_BOARD}`)
           .query({thread_id: TEST_ID})
           .end(function(err, res) {
-            console.log(`res.body: `, res.body)
             assert.equal(res.status, 200)
             assert.property(res.body, '_id', 'threads in array should contain _id')
             assert.property(res.body, 'text', 'threads in array should contain text')
@@ -126,43 +122,46 @@ suite('Functional Tests', function() {
           reply_id: TEST_REPLY_ID
         })
         .end(function(err, res) {
-          console.log(`res.status: `, res.status)
-          console.log(`res.body: `, res.body)
-          console.log(`res.text: `, res.text)
           assert.equal(res.status, 200)
           assert.equal(res.text, 'success')
           done()
         })
       })
     });
-    
-  });
 
-  suite('DELETE commands', function () {
-    suite('DELETE', function() {
-      // test('Delete thread', function(done) {
-      //   // done()
-      // })
+    suite('DELETE', function () {
 
-      test('Mark comment as [deleted]', function(done) {
+      test('Mark comment as [deleted]', function (done) {
         chai.request(server)
-        .delete(`/api/replies/${TEST_BOARD}`)
-        .send({
-          thread_id: TEST_ID,
-          reply_id: TEST_REPLY_ID,
-          delete_password: TEST_PWD
-        })
-        .end(function(err, res) {
-          console.log(`res.status: `, res.status)
-          console.log(`res.body: `, res.body)
-          console.log(`res.text: `, res.text)
-          assert.equal(res.status, 200)
-          assert.equal(res.text, 'success')
-          done()
-        })
+          .delete(`/api/replies/${TEST_BOARD}`)
+          .send({
+            thread_id: TEST_ID,
+            reply_id: TEST_REPLY_ID,
+            delete_password: TEST_PWD
+          })
+          .end(function (err, res) {
+            assert.equal(res.status, 200)
+            assert.equal(res.text, 'success')
+            done()
+          })
 
       })
-    })
+
+      test('Delete thread', function (done) {
+        chai.request(server)
+          .delete(`/api/threads/${TEST_BOARD}`)
+          .send({
+            thread_id: TEST_ID,
+            delete_password: TEST_PWD
+          })
+          .end(function (err, res) {
+            assert.equal(res.status, 200)
+            assert.equal(res.text, 'success')
+            done()
+          })
+      })
+    
+    });
     
   });
 
