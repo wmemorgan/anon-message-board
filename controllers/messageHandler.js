@@ -84,7 +84,7 @@ exports.addReply = (req, res) => {
 exports.listThreads = (req, res) => {
 console.log(`listThread req.params: `, req.params)
 let board = req.params.board.toLowerCase()
-  db.find({board}).sort({"bumped_on" : -1}).limit(10)
+  db.find({board}).sort({"bumped_on" : -1, "replies.created_on": -1}).limit(10)
     .toArray((err, doc) => {
       if (err) {
         console.error(err)
@@ -92,12 +92,17 @@ let board = req.params.board.toLowerCase()
       }
       else {
         // Code inspired by Drinka Ľubomír https://github.com/lubodrinka/Personal-Library/blob/master/routes/api.js
+        const sortByDate = (replies) => 
+          replies.sort((a, b) => {
+            if(b.created_on > a.created_on) return 1
+          })
+        
         results = doc.map(d => d = { 
           "_id": d._id, 
           "text": d.text, 
           "bumped_on": d.bumped_on,
           "created_on": d.created_on,
-          "replies" : d.replies,
+          "replies": sortByDate(d.replies.slice(-3)),
           "replycount": d.replies.length
          })
         res.send(results)
