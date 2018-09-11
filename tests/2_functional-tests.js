@@ -14,6 +14,7 @@ var expect = require('chai').expect
 
 chai.use(chaiHttp);
 const TEST_BOARD = 'TestBoard'
+const TEST_PWD = 'pwd'
 
 suite('Functional Tests', function() {
 
@@ -26,7 +27,7 @@ suite('Functional Tests', function() {
           .send({
             board: TEST_BOARD,
             text: 'Welcome to the Test Board',
-            delete_password: 'pwd'
+            delete_password: TEST_PWD
           })
           .end(function(err, res) {
             assert.equal(res.status, 200)
@@ -61,7 +62,10 @@ suite('Functional Tests', function() {
       test('report thread', function(done) {
         chai.request(server)
         .put(`/api/threads/${TEST_ID}`)
-        .send({reported: true})
+        .send({
+          report_id: TEST_ID,
+          reported: true
+        })
         .end(function(err, res) {
           // console.log(`res.body: `, res.body)
           // console.log(`res.text: `, res.text)
@@ -84,7 +88,7 @@ suite('Functional Tests', function() {
           .send({
             _id: TEST_ID,
             text: 'Hello, happy to be here!',
-            delete_password: 'pwd'
+            delete_password: TEST_PWD
           })
           .end(function(err, res) {
             assert.equal(res.status, 200)
@@ -136,8 +140,29 @@ suite('Functional Tests', function() {
 
   suite('DELETE commands', function () {
     suite('DELETE', function() {
+      // test('Delete thread', function(done) {
+      //   // done()
+      // })
 
-    });
+      test('Mark comment as [deleted]', function(done) {
+        chai.request(server)
+        .delete(`/api/replies/${TEST_BOARD}`)
+        .send({
+          thread_id: TEST_ID,
+          reply_id: TEST_REPLY_ID,
+          delete_password: TEST_PWD
+        })
+        .end(function(err, res) {
+          console.log(`res.status: `, res.status)
+          console.log(`res.body: `, res.body)
+          console.log(`res.text: `, res.text)
+          assert.equal(res.status, 200)
+          assert.equal(res.text, 'success')
+          done()
+        })
+
+      })
+    })
     
   });
 
