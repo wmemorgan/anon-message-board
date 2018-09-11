@@ -149,6 +149,8 @@ exports.reportThread = (req, res) => {
     if (err) {
       console.error(err)
       res.status(500).send(`could not update ${id}`)
+    } else if (doc.result.n == 0) {
+      res.send('incorrect info')
     }
     else {
       res.send('success')
@@ -171,6 +173,8 @@ exports.reportReply = (req, res) => {
     if (err) {
       console.error(err)
       res.status(500).send(`could not update reply id: ${replyId}`)
+    } else if (doc.result.n == 0) {
+      res.send('incorrect info')
     }
     else {
       console.log('reportReply: success')
