@@ -84,7 +84,7 @@ exports.addReply = (req, res) => {
 exports.listThreads = (req, res) => {
 console.log(`listThread req.params: `, req.params)
 let board = req.params.board.toLowerCase()
-  db.find({board})
+  db.find({board}).sort({"bumped_on" : -1}).limit(10)
     .toArray((err, doc) => {
       if (err) {
         console.error(err)
