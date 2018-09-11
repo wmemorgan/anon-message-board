@@ -188,14 +188,19 @@ exports.deleteReply = (req, res) => {
   let replyId = (hex.test(req.body.reply_id)) ? ObjectId(req.body.reply_id) : req.body.reply_id
   let query = { '_id': threadId, 'replies._id': replyId, 'delete_password': req.body.delete_password }
   console.log(`reportReply query: `, query)
-  let action = { $pull: { 'replies': {'_id': replyId} } }
+  let action = { $set: { 'replies.$.text': '[deleted]' } }
   console.log(`reportReply action: `, action)
   db.updateOne(query, action, (err, doc) => {
     if (err) {
       console.error(err)
       res.status(500).send(`could not delete reply id: ${replyId}`)
+    } else if (doc.result.n == 0 && doc.result.nModified == 0) {
+      console.log(`deleteReply doc: `, doc.result)
+      console.log(`incorrect password`)
+      res.send(`incorrect password`)
     }
     else {
+      console.log(`deleteReply doc: `, doc.result)
       console.log('deleteReply: success')
       res.send('success')
     }
