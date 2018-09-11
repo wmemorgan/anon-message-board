@@ -44,10 +44,10 @@ exports.addReply = (req, res) => {
   console.log(`addReply req.query: `, req.query)
   console.log(`addReply req.body: `, req.body)
   let { board } = req.params
-  let { text, delete_password } = req.body
+  let { thread_id, text, delete_password } = req.body
   console.log(`new text: `, text)
   let hex = /[0-9A-Fa-f]{6}/g;
-  let threadId = (hex.test(req.body.thread_id)) ? ObjectId(req.body.thread_id) : req.body.thread_id;
+  let threadId = (hex.test(thread_id)) ? ObjectId(thread_id) : thread_id;
   // let threadId = req.body.thread_id;
   console.log(`input id: `, threadId)
   let updates = {
