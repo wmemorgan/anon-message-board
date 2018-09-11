@@ -44,10 +44,10 @@ exports.addReply = (req, res) => {
   console.log(`addReply req.query: `, req.query)
   console.log(`addReply req.body: `, req.body)
   let { board } = req.params
-  let { text, delete_password } = req.body
+  let { thread_id, text, delete_password } = req.body
   console.log(`new text: `, text)
   let hex = /[0-9A-Fa-f]{6}/g;
-  let threadId = (hex.test(req.body.thread_id)) ? ObjectId(req.body.thread_id) : req.body.thread_id;
+  let threadId = (hex.test(thread_id)) ? ObjectId(thread_id) : thread_id;
   // let threadId = req.body.thread_id;
   console.log(`input id: `, threadId)
   let updates = {
@@ -84,7 +84,7 @@ exports.addReply = (req, res) => {
 exports.listThreads = (req, res) => {
 console.log(`listThread req.params: `, req.params)
 let board = req.params.board.toLowerCase()
-  db.find({board})
+  db.find({board}).sort({"bumped_on" : -1, "replies.created_on": -1}).limit(10)
     .toArray((err, doc) => {
       if (err) {
         console.error(err)
@@ -92,12 +92,17 @@ let board = req.params.board.toLowerCase()
       }
       else {
         // Code inspired by Drinka Ľubomír https://github.com/lubodrinka/Personal-Library/blob/master/routes/api.js
+        const sortByDate = (replies) => 
+          replies.sort((a, b) => {
+            if(b.created_on > a.created_on) return 1
+          })
+        
         results = doc.map(d => d = { 
           "_id": d._id, 
           "text": d.text, 
           "bumped_on": d.bumped_on,
           "created_on": d.created_on,
-          "replies" : d.replies,
+          "replies": sortByDate(d.replies.slice(-3)),
           "replycount": d.replies.length
          })
         res.send(results)
@@ -144,6 +149,8 @@ exports.reportThread = (req, res) => {
     if (err) {
       console.error(err)
       res.status(500).send(`could not update ${id}`)
+    } else if (doc.result.n == 0) {
+      res.send('incorrect info')
     }
     else {
       res.send('success')
@@ -166,6 +173,8 @@ exports.reportReply = (req, res) => {
     if (err) {
       console.error(err)
       res.status(500).send(`could not update reply id: ${replyId}`)
+    } else if (doc.result.n == 0) {
+      res.send('incorrect info')
     }
     else {
       console.log('reportReply: success')
@@ -206,14 +215,19 @@ exports.deleteReply = (req, res) => {
   let replyId = (hex.test(req.body.reply_id)) ? ObjectId(req.body.reply_id) : req.body.reply_id
   let query = { '_id': threadId, 'replies._id': replyId, 'delete_password': req.body.delete_password }
   console.log(`reportReply query: `, query)
-  let action = { $pull: { 'replies': {'_id': replyId} } }
+  let action = { $set: { 'replies.$.text': '[deleted]' } }
   console.log(`reportReply action: `, action)
   db.updateOne(query, action, (err, doc) => {
     if (err) {
       console.error(err)
       res.status(500).send(`could not delete reply id: ${replyId}`)
+    } else if (doc.result.n == 0 && doc.result.nModified == 0) {
+      console.log(`deleteReply doc: `, doc.result)
+      console.log(`incorrect password`)
+      res.send(`incorrect password`)
     }
     else {
+      console.log(`deleteReply doc: `, doc.result)
       console.log('deleteReply: success')
       res.send('success')
     }
