@@ -1,6 +1,8 @@
 **FreeCodeCamp**- Information Security and Quality Assurance
 ------
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/wmemorgan/anon-message-board.svg)](https://greenkeeper.io/)
+
 Project Anon Message Board
 
 1) SET NODE_ENV to `test` without quotes when ready to write tests and DB to your databases connection string (in .env)
